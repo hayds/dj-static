@@ -35,7 +35,7 @@ except ImportError:  # django < 1.7
             return path_info.decode('utf-8')
 
 class GzipCling(static.Cling):
-    def __call__(self, environ, start_response):        
+    def __call__(self, environ, start_response):
         """Respond to a request when called in the usual WSGI way."""
         if environ['REQUEST_METHOD'] not in ('GET', 'HEAD'):
             return self.method_not_allowed(environ, start_response)
@@ -54,7 +54,7 @@ class GzipCling(static.Cling):
                 return self.moved_permanently(environ, start_response, headers)
             else:
                 full_path = self._full_path(path_info + self.index_file)
-        
+
         #Innocent unless proved guilty
         if_gzip = False
         #if accept encoding contain gzip
@@ -62,7 +62,7 @@ class GzipCling(static.Cling):
             # check if gzip version exists
             if path.exists(full_path + '.gz'):
                 if_gzip = True
-                full_path = full_path + '.gz'                
+                full_path = full_path + '.gz'
         content_type = self._guess_type(full_path)
         try:
             etag, last_modified = self._conditions(full_path, environ)
@@ -79,8 +79,8 @@ class GzipCling(static.Cling):
             file_like = self._file_like(full_path)
             headers.append(('Content-Type', content_type))
             if if_gzip:
-                headers.append(('Content-Encoding', 'gzip'))            
-                headers.append(('Vary', 'Accept-Encoding'))            
+                headers.append(('Content-Encoding', 'gzip'))
+                headers.append(('Vary', 'Accept-Encoding'))
             start_response("200 OK", headers)
             if environ['REQUEST_METHOD'] == 'GET':
                 return self._body(full_path, environ, file_like)
@@ -94,7 +94,7 @@ class Cling(WSGIHandler):
     """WSGI middleware that intercepts calls to the static files
     directory, as defined by the STATIC_URL setting, and serves those files.
     """
-    def __init__(self, application, base_dir=None, base_url=None, ignore_debug=False):        
+    def __init__(self, application, base_dir=None, base_url=None, ignore_debug=False):
         self.application = application
         self.ignore_debug = ignore_debug
         if not base_dir:
@@ -137,7 +137,7 @@ class Cling(WSGIHandler):
         # Hand non-static requests to Django
         if not self._should_handle(get_path_info(environ)):
             return self.application(environ, start_response)
-        
+
         # Serve static requests from static.Cling
         if not self.debug or self.ignore_debug:
             environ = self._transpose_environ(environ)
